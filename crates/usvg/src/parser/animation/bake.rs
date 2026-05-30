@@ -93,8 +93,10 @@ mod tests {
     use crate::{Node, Options, Tree};
 
     fn group_transform_at(svg: &str, time: f64) -> tiny_skia_path::Transform {
-        let mut options = Options::default();
-        options.animation_time = Some(time);
+        let options = Options {
+            animation_time: Some(time),
+            ..Default::default()
+        };
         let tree = Tree::from_str(svg, &options).unwrap();
         for node in tree.root().children() {
             if let Node::Group(group) = node {

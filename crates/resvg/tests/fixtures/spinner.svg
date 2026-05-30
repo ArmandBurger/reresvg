@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect x="28" y="8" width="8" height="20" rx="4" fill="#e74c3c">
+    <animateTransform attributeName="transform" type="rotate"
+        from="0 32 32" to="360 32 32" dur="1s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="1;0.4;1" dur="1s"
+        calcMode="spline" keyTimes="0;0.5;1" keySplines=".4 0 .6 1; .4 0 .6 1"/>
+  </rect>
+</svg>

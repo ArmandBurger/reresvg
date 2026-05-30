@@ -98,20 +98,12 @@ pub struct SpriteSheet {
 }
 
 /// Controls sprite-sheet grid layout.
+#[derive(Default)]
 pub struct SheetOptions {
     /// Number of columns in the grid; `None` uses `ceil(sqrt(frame_count))` for a near-square layout.
     pub columns: Option<u32>,
     /// Inter-cell spacing in pixels added between frames (but not on the outer edges).
     pub padding: u32,
-}
-
-impl Default for SheetOptions {
-    fn default() -> SheetOptions {
-        SheetOptions {
-            columns: None,
-            padding: 0,
-        }
-    }
 }
 
 /// Packs a slice of uniform-sized frames into a single grid pixmap.
@@ -132,7 +124,7 @@ pub fn pack_sprite_sheet(
         .columns
         .unwrap_or_else(|| (frame_count as f64).sqrt().ceil() as u32)
         .max(1);
-    let rows = (frame_count as u32 + columns - 1) / columns;
+    let rows = (frame_count as u32).div_ceil(columns);
 
     let padding = sheet_options.padding;
     let sheet_width = columns * frame_width + padding * columns.saturating_sub(1);

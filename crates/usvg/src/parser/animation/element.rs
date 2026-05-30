@@ -204,9 +204,9 @@ impl ParsedAnimation {
         if self.accumulate && iteration > 0 {
             let first = &self.values[0];
             let last = &self.values[self.values.len() - 1];
-            for i in 0..components.len() {
-                let delta = last.get(i).copied().unwrap_or(0.0) - first.get(i).copied().unwrap_or(0.0);
-                components[i] += delta * iteration as f64;
+            for (index, component) in components.iter_mut().enumerate() {
+                let delta = last.get(index).copied().unwrap_or(0.0) - first.get(index).copied().unwrap_or(0.0);
+                *component += delta * iteration as f64;
             }
         }
         Some(components)
