@@ -9,7 +9,6 @@ mod element;
 mod motion;
 mod bake;
 pub(crate) use bake::apply_animations;
-#[allow(unused_imports)]
-pub(crate) use bake::has_animation;
-#[allow(unused_imports)]
-pub(crate) use bake::timeline_duration;
+
+mod animated_svg;
+pub use animated_svg::AnimatedSvg;

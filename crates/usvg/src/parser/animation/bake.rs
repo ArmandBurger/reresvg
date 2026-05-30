@@ -64,7 +64,6 @@ pub(crate) fn apply_animations(doc: &mut Document, time: f64) {
 }
 
 /// Maximum timeline length across all animations, in seconds.
-#[allow(dead_code)]
 pub(crate) fn timeline_duration(doc: &Document) -> f64 {
     let mut maximum = 0.0_f64;
     for node in doc.descendants() {
@@ -78,7 +77,6 @@ pub(crate) fn timeline_duration(doc: &Document) -> f64 {
 }
 
 /// True if the document contains any supported animation element.
-#[allow(dead_code)]
 pub(crate) fn has_animation(doc: &Document) -> bool {
     doc.descendants().any(is_animation)
 }

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 mod animation;
+pub use animation::AnimatedSvg;
 mod clippath;
 mod converter;
 mod filter;
@@ -154,6 +155,15 @@ impl crate::Tree {
             roxmltree::Document::parse_with_options(text, xml_opt).map_err(Error::ParsingFailed)?;
 
         Self::from_xmltree(&doc, opt)
+    }
+
+    /// Parses a `Tree` from a string, freezing animations at `time`.
+    pub fn from_str_at_time(text: &str, opt: &Options, time: f64) -> Result<Self, Error> {
+        let xml_opt = roxmltree::ParsingOptions { allow_dtd: true, ..Default::default() };
+        let doc = roxmltree::Document::parse_with_options(text, xml_opt).map_err(Error::ParsingFailed)?;
+        let mut tree_doc = svgtree::Document::parse_tree(&doc, opt.style_sheet.as_deref())?;
+        self::animation::apply_animations(&mut tree_doc, time);
+        self::converter::convert_doc(&tree_doc, opt)
     }
 
     /// Parses `Tree` from `roxmltree::Document`.
