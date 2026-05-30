@@ -158,7 +158,7 @@ impl crate::Tree {
     }
 
     /// Parses a `Tree` from a string, freezing animations at `time`.
-    pub fn from_str_at_time(text: &str, opt: &Options, time: f64) -> Result<Self, Error> {
+    pub(crate) fn from_str_at_time(text: &str, opt: &Options, time: f64) -> Result<Self, Error> {
         let xml_opt = roxmltree::ParsingOptions { allow_dtd: true, ..Default::default() };
         let doc = roxmltree::Document::parse_with_options(text, xml_opt).map_err(Error::ParsingFailed)?;
         let mut tree_doc = svgtree::Document::parse_tree(&doc, opt.style_sheet.as_deref())?;

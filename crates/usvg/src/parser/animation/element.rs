@@ -240,7 +240,7 @@ fn collect_value_strings(node: SvgNode) -> Vec<String> {
             let summed: Vec<f64> = from_components
                 .iter()
                 .zip(by_components.iter())
-                .map(|(a, b)| a + b)
+                .map(|(from_component, by_component)| from_component + by_component)
                 .collect();
             vec![from, format_components(&summed)]
         }
@@ -274,7 +274,7 @@ fn parse_key_splines(text: &str) -> Vec<Easing> {
     text.split(';')
         .filter(|segment| !segment.trim().is_empty())
         .filter_map(|segment| {
-            let numbers = split_numbers(segment, ' ');
+            let numbers = parse_components(segment);
             if numbers.len() == 4 {
                 Some(Easing::new(numbers[0], numbers[1], numbers[2], numbers[3]))
             } else {
@@ -416,6 +416,20 @@ mod tests {
             }
             other => panic!("unexpected {other:?}"),
         }
+    }
+
+    #[test]
+    fn parses_key_splines_comma_separated() {
+        let animation = first_animation(
+            r#"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10">
+                <rect width="10" height="10">
+                    <animate attributeName="opacity" values="0;1" dur="1s"
+                        calcMode="spline" keySplines="0.42,0,0.58,1"/>
+                </rect>
+            </svg>"#,
+        );
+        let key_splines = animation.key_splines.expect("key_splines should be Some");
+        assert_eq!(key_splines.len(), 1);
     }
 
     #[test]
