@@ -1081,3 +1081,29 @@ impl<'a, 'input: 'a> FromValue<'a, 'input> for SvgNode<'a, 'input> {
         node.document().element_by_id(id)
     }
 }
+
+#[cfg(test)]
+mod animation_retention_tests {
+    use super::*;
+
+    #[test]
+    fn animate_child_is_retained_in_svgtree() {
+        let svg = r#"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10">
+            <rect width="10" height="10">
+                <animate attributeName="opacity" from="1" to="0" dur="1s"/>
+            </rect>
+        </svg>"#;
+        let xml = roxmltree::Document::parse(svg).unwrap();
+        let doc = Document::parse_tree(&xml, None).unwrap();
+
+        let rect = doc
+            .descendants()
+            .find(|node| node.tag_name() == Some(EId::Rect))
+            .expect("rect should be present");
+        let animate = rect
+            .children()
+            .find(|child| child.tag_name() == Some(EId::Animate))
+            .expect("animate child should be retained");
+        assert_eq!(animate.attribute::<&str>(AId::AttributeName), Some("opacity"));
+    }
+}

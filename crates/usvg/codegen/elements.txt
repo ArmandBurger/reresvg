@@ -51,3 +51,8 @@ textPath
 tref
 tspan
 use
+animate
+animateMotion
+animateTransform
+set
+mpath
