@@ -70,6 +70,7 @@ fn parse<'input>(
         nodes: Vec::new(),
         attrs: Vec::new(),
         links: HashMap::new(),
+        animation_overrides: HashMap::new(),
     };
 
     // build a map of id -> node for resolve_href

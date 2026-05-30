@@ -98,6 +98,13 @@ pub struct Options<'a> {
     /// A CSS stylesheet that should be injected into the SVG. Can be used to overwrite
     /// certain attributes.
     pub style_sheet: Option<String>,
+
+    /// Freezes SMIL animations at this instant (seconds) during parsing.
+    ///
+    /// `None` (default) parses the SVG statically, exactly as if no animation
+    /// support existed. `Some(time)` bakes every animation's value at `time`
+    /// into the produced `Tree`.
+    pub animation_time: Option<f64>,
 }
 
 impl Default for Options<'_> {
@@ -119,6 +126,7 @@ impl Default for Options<'_> {
             #[cfg(feature = "text")]
             fontdb: Arc::new(fontdb::Database::new()),
             style_sheet: None,
+            animation_time: None,
         }
     }
 }

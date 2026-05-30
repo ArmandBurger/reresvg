@@ -25,6 +25,9 @@ pub struct Document<'input> {
     nodes: Vec<NodeData>,
     attrs: Vec<Attribute<'input>>,
     links: HashMap<String, NodeId>,
+    /// Per-frame animated attribute values, keyed by (node, attribute).
+    /// Populated by the animation bake pass; consulted by `SvgNode::attribute`.
+    animation_overrides: HashMap<(NodeId, AId), String>,
 }
 
 impl<'input> Document<'input> {
@@ -70,6 +73,10 @@ impl<'input> Document<'input> {
             d: &self.nodes[id.get_usize()],
             doc: self,
         }
+    }
+
+    pub(crate) fn insert_animation_override(&mut self, node: NodeId, name: AId, value: String) {
+        self.animation_overrides.insert((node, name), value);
     }
 }
 
@@ -149,7 +156,7 @@ impl ShortRange {
     }
 }
 
-#[derive(Clone, Copy, PartialEq, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq, Hash, Debug)]
 pub(crate) struct NodeId(NonZeroU32);
 
 impl NodeId {
@@ -237,7 +244,7 @@ impl PartialEq for SvgNode<'_, '_> {
 
 impl<'a, 'input: 'a> SvgNode<'a, 'input> {
     #[inline]
-    fn id(&self) -> NodeId {
+    pub(crate) fn id(&self) -> NodeId {
         self.id
     }
 
@@ -275,8 +282,23 @@ impl<'a, 'input: 'a> SvgNode<'a, 'input> {
         self.attribute(AId::Id).unwrap_or("")
     }
 
+    #[inline]
+    fn animated_attribute_value(&self, aid: AId) -> Option<&'a str> {
+        if self.doc.animation_overrides.is_empty() {
+            return None;
+        }
+        self.doc
+            .animation_overrides
+            .get(&(self.id, aid))
+            .map(|value| value.as_str())
+    }
+
     /// Returns an attribute value.
     pub fn attribute<T: FromValue<'a, 'input>>(&self, aid: AId) -> Option<T> {
+        if let Some(animated) = self.animated_attribute_value(aid) {
+            return T::parse(*self, aid, animated);
+        }
+
         let value = self
             .attributes()
             .iter()
@@ -336,7 +358,8 @@ impl<'a, 'input: 'a> SvgNode<'a, 'input> {
     /// Checks if an attribute is present.
     #[inline]
     pub fn has_attribute(&self, aid: AId) -> bool {
-        self.attributes().iter().any(|a| a.name == aid)
+        self.animated_attribute_value(aid).is_some()
+            || self.attributes().iter().any(|a| a.name == aid)
     }
 
     /// Returns a list of all element's attributes.
@@ -1079,6 +1102,34 @@ impl<'a, 'input: 'a> FromValue<'a, 'input> for SvgNode<'a, 'input> {
         }?;
 
         node.document().element_by_id(id)
+    }
+}
+
+#[cfg(test)]
+mod animation_override_tests {
+    use super::*;
+
+    #[test]
+    fn attribute_reads_animation_override() {
+        let svg = r#"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10">
+            <rect width="10" height="10"/>
+        </svg>"#;
+        let xml = roxmltree::Document::parse(svg).unwrap();
+        let mut doc = Document::parse_tree(&xml, None).unwrap();
+
+        let rect_id = doc
+            .descendants()
+            .find(|node| node.tag_name() == Some(EId::Rect))
+            .unwrap()
+            .id();
+        doc.insert_animation_override(rect_id, AId::Width, "4".to_string());
+
+        let rect = doc
+            .descendants()
+            .find(|node| node.tag_name() == Some(EId::Rect))
+            .unwrap();
+        assert_eq!(rect.attribute::<svgtypes::Length>(AId::Width).map(|length| length.number), Some(4.0));
+        assert!(rect.has_attribute(AId::Width));
     }
 }
 

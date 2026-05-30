@@ -432,6 +432,7 @@ fn process(args: Args) -> Result<(), String> {
         font_resolver: usvg::FontResolver::default(),
         fontdb: Arc::new(fontdb),
         style_sheet,
+        animation_time: None,
     };
 
     let input_svg = match in_svg {
