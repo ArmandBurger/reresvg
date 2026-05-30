@@ -335,6 +335,10 @@ impl<'a, 'input: 'a> SvgNode<'a, 'input> {
     ///
     /// Same as `SvgNode::attribute`, but doesn't show a warning.
     pub fn try_attribute<T: FromValue<'a, 'input>>(&self, aid: AId) -> Option<T> {
+        if let Some(animated) = self.animated_attribute_value(aid) {
+            return T::parse(*self, aid, animated);
+        }
+
         let value = self
             .attributes()
             .iter()
