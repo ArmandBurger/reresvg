@@ -325,7 +325,7 @@ git commit -m "feat(usvg): add animation_time option and per-Document override m
 mod animation;
 ```
 
-- [ ] **Step 2: Create the module root** `crates/usvg/src/parser/animation/mod.rs`:
+- [ ] **Step 2: Create the module root** `crates/usvg/src/parser/animation/mod.rs`. Declare ONLY the `timing` submodule for now — each later task adds its own `mod` line when it creates the file, so the crate keeps compiling after every task:
 
 ```rust
 // Copyright 2026 the Resvg Authors
@@ -334,12 +334,6 @@ mod animation;
 //! A pragmatic SMIL animation subset for sampling animated SVGs into frames.
 
 mod timing;
-mod interpolate;
-mod element;
-mod bake;
-mod animated_svg;
-
-pub use animated_svg::AnimatedSvg;
 ```
 
 - [ ] **Step 3: Write failing tests** for clock parsing and phase sampling. Create `crates/usvg/src/parser/animation/timing.rs`:
@@ -556,7 +550,7 @@ git commit -m "feat(usvg): add animation module scaffold, clock parsing and timi
 **Files:**
 - Create: `crates/usvg/src/parser/animation/interpolate.rs`
 
-- [ ] **Step 1: Write failing tests.** Create `crates/usvg/src/parser/animation/interpolate.rs`:
+- [ ] **Step 1: Declare the module and write failing tests.** Add `mod interpolate;` to `crates/usvg/src/parser/animation/mod.rs` (so the new file is compiled), then create `crates/usvg/src/parser/animation/interpolate.rs`:
 
 ```rust
 // Copyright 2026 the Resvg Authors
@@ -805,7 +799,7 @@ git commit -m "feat(usvg): add component interpolation (discrete/linear/paced/sp
 **Files:**
 - Create: `crates/usvg/src/parser/animation/element.rs`
 
-- [ ] **Step 1: Write failing tests.** Create `crates/usvg/src/parser/animation/element.rs`:
+- [ ] **Step 1: Declare the module and write failing tests.** Add `mod element;` to `crates/usvg/src/parser/animation/mod.rs` (after `mod interpolate;`), then create `crates/usvg/src/parser/animation/element.rs`:
 
 ```rust
 // Copyright 2026 the Resvg Authors
@@ -1304,7 +1298,7 @@ fn build_transform(transform_type: TransformType, components: &[f64]) -> Transfo
 }
 ```
 
-Update the module declarations in `animation/mod.rs` to add `mod motion;` (Task 7 fills it; add a temporary stub now so this task compiles):
+Add `mod motion;` to `animation/mod.rs` (after `mod element;`); Task 7 fills it in, but add the stub below now so this task compiles:
 
 ```rust
 mod motion;
@@ -1648,9 +1642,10 @@ fn format_matrix(transform: Transform) -> String {
 
 > Verify `tiny_skia_path::Transform` exposes public fields `sx, ky, kx, sy, tx, ty` (it does in 0.12) and `pre_concat`. The `timing` field of `ParsedAnimation` must be `pub` (it is).
 
-- [ ] **Step 4: Export the bake entry points.** In `crates/usvg/src/parser/animation/mod.rs`, add:
+- [ ] **Step 4: Declare and export the bake module.** In `crates/usvg/src/parser/animation/mod.rs`, add the module declaration and re-exports:
 
 ```rust
+mod bake;
 pub(crate) use bake::{apply_animations, has_animation, timeline_duration};
 ```
 
@@ -1825,7 +1820,14 @@ impl AnimatedSvg {
 
 `tree_at` (Step 3) already calls this entry point, so `animated_svg.rs` needs no further change. Note `from_str_at_time` duplicates the small `from_str` preamble (gzip is already handled by `AnimatedSvg::parse`, which stores decompressed text in `self.source`).
 
-- [ ] **Step 4: Re-export `AnimatedSvg`.** In `crates/usvg/src/parser/mod.rs`, after `mod animation;`, add:
+- [ ] **Step 4: Declare and re-export `AnimatedSvg`.** First, in `crates/usvg/src/parser/animation/mod.rs`, declare the module and re-export the type:
+
+```rust
+mod animated_svg;
+pub use animated_svg::AnimatedSvg;
+```
+
+Then in `crates/usvg/src/parser/mod.rs`, after `mod animation;`, re-export it from the parser:
 
 ```rust
 pub use animation::AnimatedSvg;
