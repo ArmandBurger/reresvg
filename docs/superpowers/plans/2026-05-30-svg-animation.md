@@ -1862,10 +1862,10 @@ git commit -m "feat(usvg): add public AnimatedSvg (parse, duration, tree_at)"
 mod animation;
 ```
 
-and after `pub use usvg;` add:
+and after `pub use usvg;` add (Task 11 extends this with the sprite-sheet items once they exist):
 
 ```rust
-pub use animation::{render_frames, render_sprite_sheet, pack_sprite_sheet, FrameOptions, SheetOptions, SpriteSheet, TimeSpan};
+pub use animation::{render_frames, FrameOptions, TimeSpan};
 ```
 
 - [ ] **Step 2: Write failing tests.** Create `crates/resvg/src/animation.rs`:
@@ -2156,6 +2156,12 @@ pub fn render_sprite_sheet(
     let frames = render_frames(animation, options, frame_options)?;
     pack_sprite_sheet(&frames, sheet_options).ok_or(usvg::Error::InvalidSize)
 }
+```
+
+- [ ] **Step 3b: Extend the re-export.** In `crates/resvg/src/lib.rs`, replace the Task 10 re-export line so it also exports the sprite-sheet items now that they exist:
+
+```rust
+pub use animation::{render_frames, render_sprite_sheet, pack_sprite_sheet, FrameOptions, SheetOptions, SpriteSheet, TimeSpan};
 ```
 
 - [ ] **Step 4: Run to verify pass**
