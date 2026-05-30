@@ -81,6 +81,106 @@ pub fn render_frames(
     Ok(frames)
 }
 
+/// A packed sprite sheet: a single pixmap arranged as a uniform grid of animation frames.
+pub struct SpriteSheet {
+    /// The composited pixmap containing all frames in a grid layout.
+    pub pixmap: tiny_skia::Pixmap,
+    /// Number of columns in the grid.
+    pub columns: u32,
+    /// Number of rows in the grid.
+    pub rows: u32,
+    /// Width of each individual frame cell in pixels.
+    pub frame_width: u32,
+    /// Height of each individual frame cell in pixels.
+    pub frame_height: u32,
+    /// Total number of frames packed into the sheet (may be less than `columns * rows`).
+    pub frame_count: usize,
+}
+
+/// Controls sprite-sheet grid layout.
+pub struct SheetOptions {
+    /// Number of columns in the grid; `None` uses `ceil(sqrt(frame_count))` for a near-square layout.
+    pub columns: Option<u32>,
+    /// Inter-cell spacing in pixels added between frames (but not on the outer edges).
+    pub padding: u32,
+}
+
+impl Default for SheetOptions {
+    fn default() -> SheetOptions {
+        SheetOptions {
+            columns: None,
+            padding: 0,
+        }
+    }
+}
+
+/// Packs a slice of uniform-sized frames into a single grid pixmap.
+///
+/// Returns `None` if `frames` is empty. All frames are assumed to be the same
+/// size; the first frame's dimensions are used for the cell size. Any remaining
+/// cells in the last row are left transparent.
+pub fn pack_sprite_sheet(
+    frames: &[tiny_skia::Pixmap],
+    sheet_options: &SheetOptions,
+) -> Option<SpriteSheet> {
+    let first = frames.first()?;
+    let frame_width = first.width();
+    let frame_height = first.height();
+    let frame_count = frames.len();
+
+    let columns = sheet_options
+        .columns
+        .unwrap_or_else(|| (frame_count as f64).sqrt().ceil() as u32)
+        .max(1);
+    let rows = (frame_count as u32 + columns - 1) / columns;
+
+    let padding = sheet_options.padding;
+    let sheet_width = columns * frame_width + padding * columns.saturating_sub(1);
+    let sheet_height = rows * frame_height + padding * rows.saturating_sub(1);
+
+    let mut pixmap = tiny_skia::Pixmap::new(sheet_width, sheet_height)?;
+    let paint = tiny_skia::PixmapPaint::default();
+
+    for (index, frame) in frames.iter().enumerate() {
+        let column = (index as u32) % columns;
+        let row = (index as u32) / columns;
+        let x = (column * (frame_width + padding)) as i32;
+        let y = (row * (frame_height + padding)) as i32;
+        pixmap.draw_pixmap(
+            x,
+            y,
+            frame.as_ref(),
+            &paint,
+            tiny_skia::Transform::identity(),
+            None,
+        );
+    }
+
+    Some(SpriteSheet {
+        pixmap,
+        columns,
+        rows,
+        frame_width,
+        frame_height,
+        frame_count,
+    })
+}
+
+/// Renders an animated SVG directly into a packed sprite sheet.
+///
+/// This is a convenience that calls [`render_frames`] followed by [`pack_sprite_sheet`],
+/// mapping an empty frame list (which can only happen when `frame_options.frame_count == 0`)
+/// to [`usvg::Error::InvalidSize`].
+pub fn render_sprite_sheet(
+    animation: &AnimatedSvg,
+    options: &usvg::Options,
+    frame_options: &FrameOptions,
+    sheet_options: &SheetOptions,
+) -> Result<SpriteSheet, usvg::Error> {
+    let frames = render_frames(animation, options, frame_options)?;
+    pack_sprite_sheet(&frames, sheet_options).ok_or(usvg::Error::InvalidSize)
+}
+
 fn sample_times(span: TimeSpan, frame_count: usize, endpoint_inclusive: bool) -> Vec<f64> {
     let length = span.end - span.start;
     if frame_count == 1 {
@@ -133,5 +233,52 @@ mod tests {
         let animation = usvg::AnimatedSvg::parse(SPINNER.as_bytes(), &options).unwrap();
         let frames = render_frames(&animation, &options, &FrameOptions { frame_count: 0, ..Default::default() }).unwrap();
         assert!(frames.is_empty());
+    }
+
+    #[test]
+    fn packs_uniform_grid() {
+        let mut frames = Vec::new();
+        for _ in 0..7 {
+            frames.push(tiny_skia::Pixmap::new(10, 8).unwrap());
+        }
+        let sheet = pack_sprite_sheet(&frames, &SheetOptions { columns: Some(3), padding: 0 }).unwrap();
+        assert_eq!(sheet.columns, 3);
+        assert_eq!(sheet.rows, 3);
+        assert_eq!(sheet.frame_width, 10);
+        assert_eq!(sheet.frame_height, 8);
+        assert_eq!(sheet.pixmap.width(), 30);
+        assert_eq!(sheet.pixmap.height(), 24);
+        assert_eq!(sheet.frame_count, 7);
+    }
+
+    #[test]
+    fn default_columns_are_near_square() {
+        let frames: Vec<_> = (0..9).map(|_| tiny_skia::Pixmap::new(4, 4).unwrap()).collect();
+        let sheet = pack_sprite_sheet(&frames, &SheetOptions { columns: None, padding: 0 }).unwrap();
+        assert_eq!(sheet.columns, 3);
+        assert_eq!(sheet.rows, 3);
+    }
+
+    #[test]
+    fn empty_frames_yield_none() {
+        assert!(pack_sprite_sheet(&[], &SheetOptions { columns: None, padding: 0 }).is_none());
+    }
+
+    #[test]
+    fn renders_fixture_sprite_sheet() {
+        let options = usvg::Options::default();
+        let data = std::fs::read(concat!(env!("CARGO_MANIFEST_DIR"), "/tests/fixtures/spinner.svg")).unwrap();
+        let animation = usvg::AnimatedSvg::parse(&data, &options).unwrap();
+        assert!(animation.is_animated());
+        let sheet = render_sprite_sheet(
+            &animation,
+            &options,
+            &FrameOptions { frame_count: 12, ..Default::default() },
+            &SheetOptions { columns: Some(4), padding: 0 },
+        )
+        .unwrap();
+        assert_eq!(sheet.pixmap.width(), 256);
+        assert_eq!(sheet.pixmap.height(), 192);
+        assert!(sheet.pixmap.data().iter().any(|byte| *byte != 0));
     }
 }

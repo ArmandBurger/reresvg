@@ -17,7 +17,7 @@
 pub use tiny_skia;
 pub use usvg;
 
-pub use animation::{render_frames, FrameOptions, TimeSpan};
+pub use animation::{render_frames, render_sprite_sheet, pack_sprite_sheet, FrameOptions, SheetOptions, SpriteSheet, TimeSpan};
 
 mod animation;
 mod clip;
