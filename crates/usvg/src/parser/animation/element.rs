@@ -8,7 +8,6 @@ use crate::parser::svgtree::{AId, EId, SvgNode};
 use super::interpolate::{CalcMode, Easing};
 use super::timing::Timing;
 
-#[allow(dead_code)]
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub(crate) enum TransformType {
     Translate,
@@ -18,7 +17,6 @@ pub(crate) enum TransformType {
     SkewY,
 }
 
-#[allow(dead_code)]
 #[derive(Clone, Debug, PartialEq)]
 pub(crate) enum AnimationTarget {
     /// A named presentation attribute (opacity, fill, width, ...).
@@ -30,7 +28,6 @@ pub(crate) enum AnimationTarget {
 }
 
 /// How interpolated components are rendered back into an attribute string.
-#[allow(dead_code)]
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub(crate) enum ValueFormat {
     /// Single scalar, formatted as a plain number ("18.5").
@@ -41,7 +38,6 @@ pub(crate) enum ValueFormat {
     DiscreteString,
 }
 
-#[allow(dead_code)]
 pub(crate) struct ParsedAnimation {
     pub target: AnimationTarget,
     pub format: ValueFormat,
@@ -60,7 +56,6 @@ pub(crate) struct ParsedAnimation {
     pub motion_rotate: MotionRotate,
 }
 
-#[allow(dead_code)]
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub(crate) enum MotionRotate {
     None,
