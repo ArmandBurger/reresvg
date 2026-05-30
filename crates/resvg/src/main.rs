@@ -578,6 +578,7 @@ fn parse_args() -> Result<Args, String> {
         font_resolver: usvg::FontResolver::default(),
         fontdb: Arc::new(fontdb::Database::new()),
         style_sheet,
+        animation_time: None,
     };
 
     Ok(Args {
