@@ -6,7 +6,7 @@ use tiny_skia_path::Transform;
 
 use super::element::{MotionRotate, ParsedAnimation};
 
-pub(crate) fn evaluate_motion(animation: &ParsedAnimation, progress: f64) -> Option<Transform> {
+pub(crate) fn evaluate_motion(animation: &ParsedAnimation, progress: f64, iteration: u32) -> Option<Transform> {
     let path_data = animation.motion_path.as_deref()?;
     let path = BezPath::from_svg(path_data).ok()?;
 
@@ -36,7 +36,18 @@ pub(crate) fn evaluate_motion(animation: &ParsedAnimation, progress: f64) -> Opt
 
     let segment = segments[chosen];
     let point = segment.eval(local.clamp(0.0, 1.0));
-    let mut transform = Transform::from_translate(point.x as f32, point.y as f32);
+
+    let (translate_x, translate_y) = if animation.accumulate && iteration > 0 {
+        let start_point = segments[0].eval(0.0);
+        let end_point = segments[segments.len() - 1].eval(1.0);
+        let accumulated_x = point.x + iteration as f64 * (end_point.x - start_point.x);
+        let accumulated_y = point.y + iteration as f64 * (end_point.y - start_point.y);
+        (accumulated_x as f32, accumulated_y as f32)
+    } else {
+        (point.x as f32, point.y as f32)
+    };
+
+    let mut transform = Transform::from_translate(translate_x, translate_y);
 
     let angle = match animation.motion_rotate {
         MotionRotate::None => None,
@@ -101,8 +112,22 @@ mod tests {
                 </rect>
             </svg>"#,
         );
-        let transform = evaluate_motion(&animation, 0.5).unwrap();
+        let transform = evaluate_motion(&animation, 0.5, 0).unwrap();
         assert!((transform.tx - 50.0).abs() < 1.0);
+        assert!(transform.ty.abs() < 1e-3);
+    }
+
+    #[test]
+    fn accumulates_motion_across_iterations() {
+        let animation = motion_animation(
+            r#"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100">
+                <rect width="10" height="10">
+                    <animateMotion path="M0,0 L100,0" dur="1s" repeatCount="2" accumulate="sum"/>
+                </rect>
+            </svg>"#,
+        );
+        let transform = evaluate_motion(&animation, 0.0, 1).unwrap();
+        assert!((transform.tx - 100.0).abs() < 1.0, "expected tx≈100 got {}", transform.tx);
         assert!(transform.ty.abs() < 1e-3);
     }
 }

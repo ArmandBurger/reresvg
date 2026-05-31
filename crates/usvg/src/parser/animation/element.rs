@@ -5,7 +5,7 @@ use std::str::FromStr;
 
 use tiny_skia_path::Transform;
 use crate::parser::svgtree::{AId, EId, SvgNode};
-use super::interpolate::{CalcMode, Easing};
+use super::interpolate::{CalcMode, Easing, discrete_index};
 use super::timing::Timing;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -107,7 +107,14 @@ impl ParsedAnimation {
         let raw_values = collect_value_strings(node);
         let (values, discrete_values) = match format {
             ValueFormat::DiscreteString => (Vec::new(), raw_values),
-            _ => (raw_values.iter().map(|text| parse_components(text)).collect(), Vec::new()),
+            ValueFormat::Color => (
+                raw_values.iter().map(|text| parse_color_components(text)).collect(),
+                Vec::new(),
+            ),
+            _ => (
+                raw_values.iter().map(|text| parse_components(text)).collect(),
+                Vec::new(),
+            ),
         };
 
         let key_times = node
@@ -183,7 +190,7 @@ impl ParsedAnimation {
                 Some(Contribution::Transform(build_transform(*transform_type, &components)))
             }
             AnimationTarget::Motion => {
-                let transform = super::motion::evaluate_motion(self, progress)?;
+                let transform = super::motion::evaluate_motion(self, progress, iteration)?;
                 Some(Contribution::Transform(transform))
             }
         }
@@ -256,6 +263,13 @@ pub(crate) fn parse_components(text: &str) -> Vec<f64> {
         .collect()
 }
 
+fn parse_color_components(text: &str) -> Vec<f64> {
+    match svgtypes::Color::from_str(text.trim()) {
+        Ok(color) => vec![color.red as f64, color.green as f64, color.blue as f64],
+        Err(_) => Vec::new(),
+    }
+}
+
 pub(crate) fn format_components(components: &[f64]) -> String {
     components
         .iter()
@@ -302,23 +316,6 @@ fn format_color(components: &[f64]) -> String {
     let green = channel(components.get(1).copied().unwrap_or(0.0));
     let blue = channel(components.get(2).copied().unwrap_or(0.0));
     format!("#{red:02x}{green:02x}{blue:02x}")
-}
-
-fn discrete_index(progress: f64, count: usize, key_times: Option<&[f64]>) -> usize {
-    if count == 0 {
-        return 0;
-    }
-    let times: Vec<f64> = match key_times {
-        Some(times) if times.len() == count => times.to_vec(),
-        _ => (0..count).map(|i| i as f64 / count as f64).collect(),
-    };
-    let mut index = 0;
-    for (i, start) in times.iter().enumerate() {
-        if progress >= *start {
-            index = i;
-        }
-    }
-    index.min(count - 1)
 }
 
 /// Builds a 2D affine transform from an `animateTransform` type and its
@@ -446,6 +443,25 @@ mod tests {
             Some(Contribution::Transform(transform)) => {
                 // rotate(45deg): sx = cos45 ≈ 0.7071.
                 assert!((transform.sx - 0.70710677).abs() < 1e-4);
+            }
+            other => panic!("unexpected {other:?}"),
+        }
+    }
+
+    #[test]
+    fn evaluates_named_color_midpoint() {
+        let animation = first_animation(
+            r##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10">
+                <rect width="10" height="10">
+                    <animate attributeName="fill" from="red" to="blue" dur="1s"/>
+                </rect>
+            </svg>"##,
+        );
+        match animation.evaluate(0.5) {
+            Some(Contribution::Attribute { name, value }) => {
+                assert_eq!(name, AId::Fill);
+                // red=(255,0,0), blue=(0,0,255); midpoint after round: (128,0,128)
+                assert_eq!(value, "#800080");
             }
             other => panic!("unexpected {other:?}"),
         }

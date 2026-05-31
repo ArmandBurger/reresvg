@@ -69,20 +69,7 @@ pub(crate) fn interpolate_components(
     let count = values.len();
 
     if calc_mode == CalcMode::Discrete {
-        // Each value occupies an equal time slice unless key_times says otherwise.
-        let index = match key_times {
-            Some(times) if times.len() == count => {
-                let mut chosen = 0;
-                for (i, start) in times.iter().enumerate() {
-                    if progress >= *start {
-                        chosen = i;
-                    }
-                }
-                chosen
-            }
-            _ => ((progress * count as f64).floor() as usize).min(count - 1),
-        };
-        return values[index.min(count - 1)].clone();
+        return values[discrete_index(progress, count, key_times)].clone();
     }
 
     let times = resolve_key_times(values, key_times, calc_mode);
@@ -152,6 +139,29 @@ fn lerp_vectors(a: &[f64], b: &[f64], local: f64) -> Vec<f64> {
         .zip(b.iter())
         .map(|(first, second)| first + (second - first) * local)
         .collect()
+}
+
+/// Returns the discrete keyframe index for `progress` in [0,1].
+///
+/// Without matching key_times, each of the `count` values occupies an equal
+/// slice of [0,1). With key_times of the same length, picks the largest
+/// interval whose start is ≤ progress, clamped to `count - 1`.
+pub(crate) fn discrete_index(progress: f64, count: usize, key_times: Option<&[f64]>) -> usize {
+    if count == 0 {
+        return 0;
+    }
+    match key_times {
+        Some(times) if times.len() == count => {
+            let mut chosen = 0;
+            for (i, start) in times.iter().enumerate() {
+                if progress >= *start {
+                    chosen = i;
+                }
+            }
+            chosen.min(count - 1)
+        }
+        _ => ((progress * count as f64).floor() as usize).min(count - 1),
+    }
 }
 
 #[cfg(test)]

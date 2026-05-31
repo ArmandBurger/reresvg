@@ -22,8 +22,7 @@ pub(crate) fn apply_animations(doc: &mut Document, time: f64) {
             continue;
         }
 
-        let mut transform_contributions: Vec<Transform> = Vec::new();
-        let mut replaces_base_transform = false;
+        let mut transform_contributions: Vec<(Transform, bool)> = Vec::new();
 
         for child in node.children().filter(|child| is_animation(*child)) {
             let animation = match ParsedAnimation::parse(child) {
@@ -35,24 +34,21 @@ pub(crate) fn apply_animations(doc: &mut Document, time: f64) {
                     overrides.push((node.id(), name, value));
                 }
                 Some(Contribution::Transform(matrix)) => {
-                    if !animation.additive {
-                        replaces_base_transform = true;
-                    }
-                    transform_contributions.push(matrix);
+                    transform_contributions.push((matrix, animation.additive));
                 }
                 None => {}
             }
         }
 
         if !transform_contributions.is_empty() {
-            let base = if replaces_base_transform {
-                Transform::identity()
-            } else {
-                node.attribute::<Transform>(AId::Transform).unwrap_or_default()
-            };
+            let base = node.attribute::<Transform>(AId::Transform).unwrap_or_default();
             let mut result = base;
-            for matrix in transform_contributions {
-                result = result.pre_concat(matrix);
+            for (index, (matrix, is_additive)) in transform_contributions.into_iter().enumerate() {
+                if index == 0 && !is_additive {
+                    result = matrix;
+                } else {
+                    result = result.pre_concat(matrix);
+                }
             }
             overrides.push((node.id(), AId::Transform, format_matrix(result)));
         }
@@ -119,6 +115,21 @@ mod tests {
         // rotate(45deg): sx = cos45 ≈ 0.7071, ky = sin45 ≈ 0.7071.
         assert!((transform.sx - 0.70710677).abs() < 1e-3);
         assert!((transform.ky - 0.70710677).abs() < 1e-3);
+    }
+
+    #[test]
+    fn additive_transform_preserves_base() {
+        let svg = r#"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+            <g transform="translate(10 0)">
+                <rect x="0" y="0" width="4" height="4"/>
+                <animateTransform attributeName="transform" type="translate"
+                    additive="sum" from="0 0" to="20 0" dur="1s"/>
+            </g>
+        </svg>"#;
+        let transform = group_transform_at(svg, 0.5);
+        // Static base translate(10,0) + animated translate(10,0) at t=0.5 = translate(20,0).
+        assert!((transform.tx - 20.0).abs() < 1e-2, "expected tx≈20 got {}", transform.tx);
+        assert!(transform.ty.abs() < 1e-2);
     }
 
     #[test]
