@@ -5,3 +5,4 @@ target
 tools/build-*
 **/diffs
 spinner_sheet.png
+docs/superpowers/
