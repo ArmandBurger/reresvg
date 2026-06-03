@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <g>
+    <polygon points="0,-4 16,0 0,4" fill="#06b6d4"/>
+    <animateMotion dur="1.5s" repeatCount="indefinite" rotate="auto"
+      path="M12,32 C12,12 52,12 52,32 C52,52 12,52 12,32 Z"/>
+  </g>
+</svg>
