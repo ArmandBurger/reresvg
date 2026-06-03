@@ -42,6 +42,10 @@ pub struct FrameTimer(pub Timer);
 #[derive(Resource, Default)]
 pub struct RebakeRequested(pub bool);
 
+/// Set for one frame when the user requests a single-step while paused.
+#[derive(Resource, Default)]
+pub struct StepRequested(pub bool);
+
 /// Builds a Bevy `Image` (straight-alpha sRGB) from a baked sheet.
 pub fn baked_to_image(baked: &BakedSheet) -> Image {
     Image::new(
@@ -171,14 +175,21 @@ pub fn advance_frames(
     time: Res<Time>,
     config: Res<DemoConfig>,
     mut timer: ResMut<FrameTimer>,
+    mut step: ResMut<StepRequested>,
     mut query: Query<(&mut Sprite, &mut IconCell)>,
 ) {
-    if config.paused {
+    let stepping = step.0;
+    step.0 = false;
+
+    let advance = if config.paused {
+        stepping
+    } else {
+        timer.0.tick(time.delta()).just_finished()
+    };
+    if !advance {
         return;
     }
-    if !timer.0.tick(time.delta()).just_finished() {
-        return;
-    }
+
     for (mut sprite, mut cell) in query.iter_mut() {
         let Some(atlas) = sprite.texture_atlas.as_mut() else {
             continue;
@@ -197,12 +208,17 @@ pub fn handle_controls(
     mut config: ResMut<DemoConfig>,
     mut timer: ResMut<FrameTimer>,
     mut rebake: ResMut<RebakeRequested>,
+    mut step: ResMut<StepRequested>,
     mut exit: EventWriter<AppExit>,
 ) {
     let mut timer_dirty = false;
 
     if keys.just_pressed(KeyCode::Space) {
         config.paused = !config.paused;
+    }
+    if keys.just_pressed(KeyCode::Period) && config.paused {
+        // Request a single-step; advance_frames consumes this flag next frame.
+        step.0 = true;
     }
     if keys.just_pressed(KeyCode::ArrowUp) {
         config.change_fps(1.0);
@@ -294,5 +310,51 @@ pub fn rebake_icons(
     }
 }
 
-pub fn update_overlay() {}
-pub fn update_background() {}
+/// Refreshes the on-screen config readout every frame.
+pub fn update_overlay(config: Res<DemoConfig>, mut query: Query<&mut Text, With<OverlayText>>) {
+    let Ok(mut text) = query.single_mut() else {
+        return;
+    };
+    let loop_mode = match config.loop_mode {
+        crate::config::LoopMode::Loop => "loop",
+        crate::config::LoopMode::PingPong => "ping-pong",
+        crate::config::LoopMode::Once => "once",
+    };
+    let background = match config.background {
+        Background::Dark => "dark",
+        Background::Light => "light",
+        Background::Checker => "checker",
+    };
+    text.0 = format!(
+        "frames [ ]: {}   size - =: {}px   pad ,: {}px   fps Up/Dn: {:.0}\n\
+         loop L: {}   bg B: {}   {}   space=pause  .=step  R=reset  Esc=quit",
+        config.frame_count,
+        config.render_size,
+        config.padding,
+        config.fps,
+        loop_mode,
+        background,
+        if config.paused { "PAUSED" } else { "playing" },
+    );
+}
+
+/// Applies the background mode: clear color for dark/light, and toggles the
+/// tiled checkerboard sprite's visibility for checker.
+pub fn update_background(
+    config: Res<DemoConfig>,
+    mut clear: ResMut<ClearColor>,
+    mut query: Query<&mut Visibility, With<CheckerBackground>>,
+) {
+    clear.0 = match config.background {
+        Background::Dark => Color::srgb(0.10, 0.10, 0.12),
+        Background::Light => Color::srgb(0.86, 0.86, 0.88),
+        Background::Checker => Color::srgb(0.10, 0.10, 0.12),
+    };
+    if let Ok(mut visibility) = query.single_mut() {
+        *visibility = if config.background == Background::Checker {
+            Visibility::Visible
+        } else {
+            Visibility::Hidden
+        };
+    }
+}

@@ -42,6 +42,7 @@ pub fn run() {
             TimerMode::Repeating,
         )))
         .insert_resource(systems::RebakeRequested::default())
+        .insert_resource(systems::StepRequested::default())
         .add_systems(Startup, systems::setup)
         .add_systems(
             Update,
