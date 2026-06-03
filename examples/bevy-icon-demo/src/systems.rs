@@ -190,7 +190,109 @@ pub fn advance_frames(
     }
 }
 
-pub fn handle_controls() {}
-pub fn rebake_icons() {}
+/// Translates key presses into config changes, flagging a re-bake when a change
+/// affects the baked sheets (frame count, render size, padding, reset).
+pub fn handle_controls(
+    keys: Res<ButtonInput<KeyCode>>,
+    mut config: ResMut<DemoConfig>,
+    mut timer: ResMut<FrameTimer>,
+    mut rebake: ResMut<RebakeRequested>,
+    mut exit: EventWriter<AppExit>,
+) {
+    let mut timer_dirty = false;
+
+    if keys.just_pressed(KeyCode::Space) {
+        config.paused = !config.paused;
+    }
+    if keys.just_pressed(KeyCode::ArrowUp) {
+        config.change_fps(1.0);
+        timer_dirty = true;
+    }
+    if keys.just_pressed(KeyCode::ArrowDown) {
+        config.change_fps(-1.0);
+        timer_dirty = true;
+    }
+    if keys.just_pressed(KeyCode::BracketRight) {
+        config.change_frame_count(1);
+        rebake.0 = true;
+    }
+    if keys.just_pressed(KeyCode::BracketLeft) {
+        config.change_frame_count(-1);
+        rebake.0 = true;
+    }
+    if keys.just_pressed(KeyCode::Equal) {
+        config.change_size(16);
+        rebake.0 = true;
+    }
+    if keys.just_pressed(KeyCode::Minus) {
+        config.change_size(-16);
+        rebake.0 = true;
+    }
+    if keys.just_pressed(KeyCode::Comma) {
+        config.cycle_padding();
+        rebake.0 = true;
+    }
+    if keys.just_pressed(KeyCode::KeyL) {
+        config.loop_mode = config.loop_mode.next();
+    }
+    if keys.just_pressed(KeyCode::KeyB) {
+        config.background = config.background.next();
+    }
+    if keys.just_pressed(KeyCode::KeyR) {
+        *config = DemoConfig::default();
+        rebake.0 = true;
+        timer_dirty = true;
+    }
+    if keys.just_pressed(KeyCode::Escape) {
+        exit.write(AppExit::Success);
+    }
+
+    if timer_dirty {
+        let seconds = 1.0 / config.fps;
+        timer.0.set_duration(std::time::Duration::from_secs_f32(seconds));
+    }
+}
+
+/// When a re-bake is requested, re-bakes every icon at the current config and
+/// swaps each cell's texture and atlas layout in place. Keeps the old texture
+/// on failure.
+pub fn rebake_icons(
+    config: Res<DemoConfig>,
+    mut rebake: ResMut<RebakeRequested>,
+    mut images: ResMut<Assets<Image>>,
+    mut atlases: ResMut<Assets<TextureAtlasLayout>>,
+    mut query: Query<(&mut Sprite, &mut IconCell)>,
+) {
+    if !rebake.0 {
+        return;
+    }
+    rebake.0 = false;
+
+    for (mut sprite, mut cell) in query.iter_mut() {
+        let icon = &ICONS[cell.index];
+        match bake_icon(icon.svg, config.frame_count, config.render_size, config.padding) {
+            Ok(baked) => {
+                let layout = TextureAtlasLayout::from_grid(
+                    UVec2::new(baked.frame_width, baked.frame_height),
+                    baked.columns,
+                    baked.rows,
+                    if config.padding > 0 { Some(UVec2::splat(config.padding)) } else { None },
+                    None,
+                );
+                sprite.image = images.add(baked_to_image(&baked));
+                if let Some(atlas) = sprite.texture_atlas.as_mut() {
+                    atlas.layout = atlases.add(layout);
+                    atlas.index = 0;
+                }
+                cell.frame_count = baked.frame_count;
+                cell.descending = false;
+            }
+            Err(error) => {
+                bevy::log::error!("re-bake of {} failed, keeping previous: {error}", icon.name);
+            }
+        }
+    }
+}
+
 pub fn update_overlay() {}
 pub fn update_background() {}
