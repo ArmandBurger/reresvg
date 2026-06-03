@@ -166,8 +166,31 @@ pub fn setup(
     ));
 }
 
+/// Advances every icon sprite's atlas index according to the timer and loop mode.
+pub fn advance_frames(
+    time: Res<Time>,
+    config: Res<DemoConfig>,
+    mut timer: ResMut<FrameTimer>,
+    mut query: Query<(&mut Sprite, &mut IconCell)>,
+) {
+    if config.paused {
+        return;
+    }
+    if !timer.0.tick(time.delta()).just_finished() {
+        return;
+    }
+    for (mut sprite, mut cell) in query.iter_mut() {
+        let Some(atlas) = sprite.texture_atlas.as_mut() else {
+            continue;
+        };
+        let (next, descending) =
+            next_frame_index(atlas.index, cell.descending, cell.frame_count, config.loop_mode);
+        atlas.index = next;
+        cell.descending = descending;
+    }
+}
+
 pub fn handle_controls() {}
 pub fn rebake_icons() {}
-pub fn advance_frames() {}
 pub fn update_overlay() {}
 pub fn update_background() {}
