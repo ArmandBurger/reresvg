@@ -1,3 +1,3 @@
 fn main() {
-    println!("bevy-icon-demo: scaffold");
+    bevy_icon_demo::app::run();
 }

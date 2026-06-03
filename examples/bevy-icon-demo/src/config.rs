@@ -1,6 +1,9 @@
-//! Pure configuration model for the demo: the live-tunable settings, their
+//! Configuration model for the demo: the live-tunable settings, their
 //! clamping/cycling rules, and the frame-index advance used during playback.
-//! No Bevy types here so it is fully unit-testable.
+//! The logic is Bevy-free so it is fully unit-testable; `DemoConfig` only
+//! additionally derives `Resource` so the app can store it.
+
+use bevy::ecs::resource::Resource;
 
 /// How playback loops once the last frame is reached.
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
@@ -50,7 +53,7 @@ pub const FPS_MAX: f32 = 60.0;
 pub const PADDING_STEPS: [u32; 3] = [0, 2, 8];
 
 /// Live, user-tunable demo configuration.
-#[derive(Clone, Copy, PartialEq, Debug)]
+#[derive(Resource, Clone, Copy, PartialEq, Debug)]
 pub struct DemoConfig {
     pub frame_count: usize,
     pub render_size: u32,

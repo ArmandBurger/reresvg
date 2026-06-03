@@ -1,7 +1,9 @@
 //! Standalone Bevy demo that showcases this fork's SMIL animation feature by
 //! baking animated SVG icons into sprite sheets and playing them back.
 
+pub mod app;
 pub mod bake;
 pub mod config;
 pub mod grid;
 pub mod icons;
+pub mod systems;
