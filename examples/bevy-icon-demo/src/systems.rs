@@ -129,7 +129,7 @@ pub fn setup(
                 ));
             }
             Err(error) => {
-                eprintln!("icon {} failed to bake: {error}", icon.name);
+                bevy::log::error!("icon {} failed to bake: {error}", icon.name);
                 commands.spawn((
                     Sprite {
                         color: PLACEHOLDER_COLOR,

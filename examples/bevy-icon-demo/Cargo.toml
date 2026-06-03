@@ -18,6 +18,7 @@ bevy = { version = "0.16", default-features = false, features = [
     "bevy_sprite",
     "bevy_ui",
     "bevy_text",
+    "bevy_log",
     "default_font",
     "x11",
     "wayland",
