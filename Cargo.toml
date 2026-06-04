@@ -9,3 +9,5 @@ resolver = "2"
 
 [workspace.package]
 license = "MIT"
+repository = "https://github.com/ArmandBurger/reresvg"
+authors = ["Armand Burger"]
