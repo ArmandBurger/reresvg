@@ -14,7 +14,7 @@ pub fn run() {
 
     let window_plugin = WindowPlugin {
         primary_window: Some(Window {
-            title: "resvg animated-icon demo".into(),
+            title: "reresvg animated-icon demo".into(),
             resolution: (760.0, 820.0).into(),
             ..default()
         }),

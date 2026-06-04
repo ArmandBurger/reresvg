@@ -28,7 +28,7 @@ cargo run --release
 ## How it works
 
 Each icon is an animated SVG under `assets/icons/`. At startup (and whenever a
-re-bake key is pressed) the app calls `resvg::render_sprite_sheet` to sample the
+re-bake key is pressed) the app calls `reresvg::render_sprite_sheet` to sample the
 animation into `frame_count` frames packed into a grid, converts the
 premultiplied output to straight-alpha RGBA, uploads it as a Bevy texture, and
 plays it back through a `TextureAtlas`. This exercises the exact sprite-sheet
