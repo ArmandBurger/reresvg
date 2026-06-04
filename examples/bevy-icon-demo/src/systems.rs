@@ -2,7 +2,6 @@
 //! runs playback, controls, re-baking, overlay, and background systems.
 
 use bevy::prelude::*;
-use bevy::image::Image;
 use bevy::render::render_asset::RenderAssetUsages;
 use bevy::render::render_resource::{Extent3d, TextureDimension, TextureFormat};
 
@@ -295,10 +294,20 @@ pub fn rebake_icons(
                     if config.padding > 0 { Some(UVec2::splat(config.padding)) } else { None },
                     None,
                 );
+                let layout_handle = atlases.add(layout);
                 sprite.image = images.add(baked_to_image(&baked));
-                if let Some(atlas) = sprite.texture_atlas.as_mut() {
-                    atlas.layout = atlases.add(layout);
-                    atlas.index = 0;
+                match sprite.texture_atlas.as_mut() {
+                    Some(atlas) => {
+                        atlas.layout = layout_handle;
+                        atlas.index = 0;
+                    }
+                    None => {
+                        // A placeholder cell from a previously failed bake carries
+                        // no atlas; reconstruct one and clear the magenta tint now
+                        // that the icon bakes successfully.
+                        sprite.texture_atlas = Some(TextureAtlas { layout: layout_handle, index: 0 });
+                        sprite.color = Color::WHITE;
+                    }
                 }
                 cell.frame_count = baked.frame_count;
                 cell.descending = false;
