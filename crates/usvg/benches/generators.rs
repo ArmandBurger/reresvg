@@ -79,10 +79,13 @@ pub fn css_heavy(n: usize) -> String {
 pub fn path_segments(n: usize) -> String {
     let mut data = String::from("M0 0");
     for i in 0..n {
-        let a = (i % 100) as f64;
-        let b = ((i + 33) % 100) as f64;
-        let c = ((i + 66) % 100) as f64;
-        let _ = write!(data, " C{a} {b} {b} {c} {c} {a}");
+        let first_control = (i % 100) as f64;
+        let second_control = ((i + 33) % 100) as f64;
+        let third_control = ((i + 66) % 100) as f64;
+        let _ = write!(
+            data,
+            " C{first_control} {second_control} {second_control} {third_control} {third_control} {first_control}"
+        );
     }
     format!(r##"{HEADER}<path d="{data}" fill="none" stroke="#000"/></svg>"##)
 }
