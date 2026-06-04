@@ -1,13 +1,13 @@
 [package]
-name = "reresvg"
-version = "0.47.0"
-keywords = ["svg", "render", "raster"]
-license.workspace = true
-repository.workspace = true
-authors.workspace = true
-edition = "2024"
+name        = "reresvg"
+version     = "0.47.0"
 description = "An SVG rendering library."
-exclude = ["tests"]
+keywords    = ["svg", "render", "raster"]
+edition.workspace    = true
+license.workspace    = true
+repository.workspace = true
+authors.workspace    = true
+exclude   = ["tests"]
 workspace = "../.."
 
 [[bin]]
@@ -15,19 +15,21 @@ name = "reresvg"
 required-features = ["text", "system-fonts", "memmap-fonts"]
 
 [dependencies]
-gif = { version = "0.14.1", optional = true }
-image-webp = { version = "0.2.4", optional = true }
-log = "0.4"
-pico-args = { version = "0.5", features = ["eq-separator"] }
-rgb = "0.8"
-svgtypes = "0.16.1"
-tiny-skia = "0.12.0"
-usvg = { path = "../usvg", version = "0.47.0", default-features = false }
-zune-jpeg = { version = "0.5.8", optional = true }
+usvg      = { workspace = true }
+tiny-skia = { workspace = true }
+rgb       = { workspace = true }
+svgtypes  = { workspace = true }
+log       = { workspace = true }
+pico-args = { workspace = true }
+
+# Raster image decoding (optional)
+gif        = { workspace = true, optional = true }
+image-webp = { workspace = true, optional = true }
+zune-jpeg  = { workspace = true, optional = true }
 
 [dev-dependencies]
-once_cell = "1.21"
-png = "0.18.0"
+once_cell = { workspace = true }
+png       = { workspace = true }
 
 [features]
 default = ["text", "system-fonts", "memmap-fonts", "raster-images"]
