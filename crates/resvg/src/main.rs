@@ -1,5 +1,6 @@
 // Copyright 2020 the Resvg Authors
-// SPDX-License-Identifier: Apache-2.0 OR MIT
+// Copyright 2026 Armand Burger
+// SPDX-License-Identifier: MIT
 
 #![allow(clippy::uninlined_format_args)]
 
@@ -119,17 +120,17 @@ fn process() -> Result<(), String> {
 }
 
 const HELP: &str = "\
-resvg is an SVG rendering application.
+reresvg is an SVG rendering application.
 
 USAGE:
-  resvg [OPTIONS] <in-svg> <out-png>  # from file to file
-  resvg [OPTIONS] <in-svg> -c         # from file to stdout
-  resvg [OPTIONS] - <out-png>         # from stdin to file
-  resvg [OPTIONS] - -c                # from stdin to stdout
+  reresvg [OPTIONS] <in-svg> <out-png>  # from file to file
+  reresvg [OPTIONS] <in-svg> -c         # from file to stdout
+  reresvg [OPTIONS] - <out-png>         # from stdin to file
+  reresvg [OPTIONS] - -c                # from stdin to stdout
 
-  resvg in.svg out.png
-  resvg -z 4 in.svg out.png
-  resvg --query-all in.svg
+  reresvg in.svg out.png
+  reresvg -z 4 in.svg out.png
+  reresvg --query-all in.svg
 
 OPTIONS:
       --help                    Prints this help
@@ -695,7 +696,7 @@ fn render_svg(args: &Args, tree: &usvg::Tree) -> Result<tiny_skia::Pixmap, Strin
 
         let ts = args.fit_to.fit_to_transform(tree.size().to_int_size());
 
-        resvg::render_node(node, ts, &mut pixmap.as_mut());
+        reresvg::render_node(node, ts, &mut pixmap.as_mut());
 
         if args.export_area_page {
             // TODO: add offset support to render_node() so we would not need an additional pixmap
@@ -741,7 +742,7 @@ fn render_svg(args: &Args, tree: &usvg::Tree) -> Result<tiny_skia::Pixmap, Strin
 
         let ts = args.fit_to.fit_to_transform(tree.size().to_int_size());
 
-        resvg::render(tree, ts, &mut pixmap.as_mut());
+        reresvg::render(tree, ts, &mut pixmap.as_mut());
 
         if args.export_area_drawing {
             trim_pixmap(tree, ts, &pixmap).unwrap_or(pixmap)

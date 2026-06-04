@@ -1,8 +1,9 @@
 // Copyright 2017 the Resvg Authors
-// SPDX-License-Identifier: Apache-2.0 OR MIT
+// Copyright 2026 Armand Burger
+// SPDX-License-Identifier: MIT
 
 /*!
-[resvg](https://github.com/linebender/resvg) is an SVG rendering library.
+reresvg is an SVG rendering library, a fork of [resvg](https://github.com/linebender/resvg).
 */
 
 #![forbid(unsafe_code)]

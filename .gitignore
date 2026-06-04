@@ -2,7 +2,6 @@ target
 .directory
 .DS_Store
 .vscode
-tools/build-*
 **/diffs
-spinner_sheet.png
-docs/superpowers/
+.claude/
+docs/

@@ -1,17 +1,17 @@
 [package]
-name = "resvg"
+name = "reresvg"
 version = "0.47.0"
 keywords = ["svg", "render", "raster"]
 license.workspace = true
+repository.workspace = true
+authors.workspace = true
 edition = "2024"
-rust-version = "1.87.0"
 description = "An SVG rendering library."
-repository = "https://github.com/linebender/resvg"
 exclude = ["tests"]
 workspace = "../.."
 
 [[bin]]
-name = "resvg"
+name = "reresvg"
 required-features = ["text", "system-fonts", "memmap-fonts"]
 
 [dependencies]
