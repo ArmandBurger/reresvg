@@ -1,10 +1,8 @@
 [workspace]
 members = [
-    "crates/c-api",
     "crates/resvg",
     "crates/usvg",
     "crates/usvg/codegen",
-    #"tools/explorer-thumbnailer",
 ]
 default-members = ["crates/resvg"]
 resolver = "2"

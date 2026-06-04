@@ -478,14 +478,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "resvg-capi"
-version = "0.47.0"
-dependencies = [
- "log",
- "resvg",
-]
-
-[[package]]
 name = "rgb"
 version = "0.8.52"
 source = "registry+https://github.com/rust-lang/crates.io-index"
