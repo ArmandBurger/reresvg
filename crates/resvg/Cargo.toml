@@ -1,5 +1,5 @@
 [package]
-name = "resvg"
+name = "reresvg"
 version = "0.47.0"
 keywords = ["svg", "render", "raster"]
 license.workspace = true
@@ -11,7 +11,7 @@ exclude = ["tests"]
 workspace = "../.."
 
 [[bin]]
-name = "resvg"
+name = "reresvg"
 required-features = ["text", "system-fonts", "memmap-fonts"]
 
 [dependencies]

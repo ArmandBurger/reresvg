@@ -9,11 +9,11 @@ fn main() {
     let animation = usvg::AnimatedSvg::parse(&data, &options).expect("parse animated SVG");
     println!("animated: {}, duration: {}s", animation.is_animated(), animation.duration());
 
-    let sheet = resvg::render_sprite_sheet(
+    let sheet = reresvg::render_sprite_sheet(
         &animation,
         &options,
-        &resvg::FrameOptions { frame_count: 12, ..Default::default() },
-        &resvg::SheetOptions { columns: Some(4), padding: 0 },
+        &reresvg::FrameOptions { frame_count: 12, ..Default::default() },
+        &reresvg::SheetOptions { columns: Some(4), padding: 0 },
     )
     .expect("render sprite sheet");
 

@@ -1,9 +1,9 @@
 //! Bakes an animated SVG into a sprite sheet and converts the pixels into the
 //! straight-alpha RGBA layout Bevy's sprite pipeline expects.
 
-use resvg::tiny_skia::IntSize;
-use resvg::usvg::{AnimatedSvg, Options};
-use resvg::{FrameOptions, SheetOptions};
+use reresvg::tiny_skia::IntSize;
+use reresvg::usvg::{AnimatedSvg, Options};
+use reresvg::{FrameOptions, SheetOptions};
 
 /// A baked sprite sheet in Bevy-ready straight-alpha RGBA8, plus its grid metadata.
 pub struct BakedSheet {
@@ -26,7 +26,7 @@ pub enum BakeError {
     /// The requested render size was invalid (zero).
     BadSize,
     /// The underlying usvg/resvg pipeline failed.
-    Render(resvg::usvg::Error),
+    Render(reresvg::usvg::Error),
 }
 
 impl std::fmt::Display for BakeError {
@@ -41,8 +41,8 @@ impl std::fmt::Display for BakeError {
 
 impl std::error::Error for BakeError {}
 
-impl From<resvg::usvg::Error> for BakeError {
-    fn from(error: resvg::usvg::Error) -> BakeError {
+impl From<reresvg::usvg::Error> for BakeError {
+    fn from(error: reresvg::usvg::Error) -> BakeError {
         BakeError::Render(error)
     }
 }
@@ -67,7 +67,7 @@ pub fn bake_icon(svg: &[u8], frame_count: usize, size: u32, padding: u32) -> Res
     };
     let sheet_options = SheetOptions { columns: None, padding };
 
-    let sheet = resvg::render_sprite_sheet(&animation, &options, &frame_options, &sheet_options)?;
+    let sheet = reresvg::render_sprite_sheet(&animation, &options, &frame_options, &sheet_options)?;
     let rgba = demultiply_to_straight(sheet.pixmap.data());
 
     Ok(BakedSheet {
