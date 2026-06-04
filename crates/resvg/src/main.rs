@@ -1,5 +1,6 @@
 // Copyright 2020 the Resvg Authors
-// SPDX-License-Identifier: Apache-2.0 OR MIT
+// Copyright 2026 Armand Burger
+// SPDX-License-Identifier: MIT
 
 #![allow(clippy::uninlined_format_args)]
 
