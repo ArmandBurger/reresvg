@@ -48,7 +48,9 @@ unicode-script = { workspace = true, optional = true }
 unicode-vo     = { workspace = true, optional = true }
 
 [dev-dependencies]
-once_cell = { workspace = true }
+once_cell     = { workspace = true }
+criterion     = { workspace = true }
+iai-callgrind = { workspace = true }
 
 [features]
 default = ["text", "system-fonts", "memmap-fonts"]
@@ -59,3 +61,11 @@ text = ["fontdb", "rustybuzz", "ttf-parser", "unicode-bidi", "unicode-script", "
 system-fonts = ["fontdb/fs", "fontdb/fontconfig"]
 # Enables font files memmaping for faster loading.
 memmap-fonts = ["fontdb/memmap"]
+
+[[bench]]
+name = "parsing"
+harness = false
+
+[[bench]]
+name = "parsing_iai"
+harness = false

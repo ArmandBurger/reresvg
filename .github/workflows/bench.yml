@@ -1,0 +1,20 @@
+name: benchmarks
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  parser-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+      - name: Install Valgrind
+        run: sudo apt-get update && sudo apt-get install -y valgrind
+      - name: Install iai-callgrind runner
+        run: cargo install iai-callgrind-runner --version 0.14.2
+      - name: Run parser instruction-count benchmarks
+        run: cargo bench -p usvg --bench parsing_iai
