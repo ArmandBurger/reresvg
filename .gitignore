@@ -5,3 +5,4 @@ target
 **/diffs
 .claude/
 docs/
+__pycache__/
