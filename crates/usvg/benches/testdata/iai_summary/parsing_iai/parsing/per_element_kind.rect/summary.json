@@ -1,0 +1,23 @@
+{
+  "version": "3",
+  "module_path": "parsing_iai::parsing::per_element_kind",
+  "function_name": "per_element_kind",
+  "id": "rect",
+  "callgrind_summary": {
+    "callgrind_run": {
+      "segments": [],
+      "total": {
+        "summary": {
+          "Ir": { "metrics": { "Left": 222222 } },
+          "Dr": { "metrics": { "Left": 70000 } },
+          "Dw": { "metrics": { "Left": 30000 } },
+          "L1hits": { "metrics": { "Left": 44444 } },
+          "LLhits": { "metrics": { "Left": 333 } },
+          "RamHits": { "metrics": { "Left": 91 } },
+          "EstimatedCycles": { "metrics": { "Left": 55555 } }
+        },
+        "regressions": []
+      }
+    }
+  }
+}

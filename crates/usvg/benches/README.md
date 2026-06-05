@@ -39,3 +39,39 @@ runs this on every pull request (`.github/workflows/bench.yml`).
   limit.
 - `parse/per_element_kind` — every supported element kind at fixed n; ensures
   each element type stays fast individually.
+
+## CI history & regression tracking
+
+On every push to `main` and every pull request, `.github/workflows/bench.yml`
+runs the iai-callgrind parser benchmarks with `--save-summary=json`, converts the
+per-benchmark `summary.json` files with `iai_to_benchmark_json.py`, and feeds the
+result to `benchmark-action/github-action-benchmark`.
+
+- **Push to `main`:** the new instruction-count / cache / cycle numbers are
+  appended to the `gh-pages` history and the trend chart regenerates at
+  <https://armandburger.github.io/reresvg/dev/bench/>.
+- **Pull request:** the run is compared against the latest `main` baseline. Any
+  series more than 5% worse triggers an advisory comment. Regressions never fail
+  the build (`fail-on-alert: false`); small counters such as RAM/LL hits can swing
+  several percent on a one-hit change, so treat those comments as informational.
+
+Five metrics are tracked per benchmark: Instructions, L1 Hits, LL Hits, RAM Hits,
+and Estimated Cycles.
+
+### One-time setup (repository owner)
+
+1. Create an empty `gh-pages` branch and push it to `origin`.
+2. Settings → Pages → Source: *Deploy from a branch* → `gh-pages` / root.
+3. Settings → Actions → General → Workflow permissions → *Read and write
+   permissions* (lets `GITHUB_TOKEN` push history and post comments).
+
+History commits are authored by `github-actions[bot]`, never a personal git
+identity.
+
+### Updating the converter
+
+`iai_to_benchmark_json.py` reads `callgrind_summary.callgrind_run.total.summary`
+from each `summary.json` (iai-callgrind summary schema v3). Its tests run without
+extra dependencies:
+
+    python3 crates/usvg/benches/test_iai_converter.py
