@@ -1,0 +1,23 @@
+{
+  "version": "3",
+  "module_path": "parsing_iai::parsing::scaled",
+  "function_name": "scaled",
+  "id": "flat",
+  "callgrind_summary": {
+    "callgrind_run": {
+      "segments": [],
+      "total": {
+        "summary": {
+          "Ir": { "metrics": { "Left": 1234567 } },
+          "Dr": { "metrics": { "Left": 400000 } },
+          "Dw": { "metrics": { "Left": 200000 } },
+          "L1hits": { "metrics": { "Left": 234567 } },
+          "LLhits": { "metrics": { "Left": 4321 } },
+          "RamHits": { "metrics": { "Left": 765 } },
+          "EstimatedCycles": { "metrics": { "Left": 999999 } }
+        },
+        "regressions": []
+      }
+    }
+  }
+}
