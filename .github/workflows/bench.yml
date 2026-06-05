@@ -5,6 +5,14 @@ on:
   push:
     branches: [main]
 
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: benchmarks-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   parser-regression:
     runs-on: ubuntu-latest
@@ -17,4 +25,18 @@ jobs:
       - name: Install iai-callgrind runner
         run: cargo install iai-callgrind-runner --version 0.14.2
       - name: Run parser instruction-count benchmarks
-        run: cargo bench -p usvg --bench parsing_iai
+        run: cargo bench -p usvg --bench parsing_iai -- --save-summary=json
+      - name: Convert iai-callgrind summaries to benchmark JSON
+        run: python3 crates/usvg/benches/iai_to_benchmark_json.py --input-root target/iai --output output.json
+      - name: Store result, compare, and update chart
+        uses: benchmark-action/github-action-benchmark@52576c92bccf6ac60c8223ec7eb2565637cae9ba # v1.22.1
+        with:
+          name: usvg parser (iai-callgrind)
+          tool: customSmallerIsBetter
+          output-file-path: output.json
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          alert-threshold: '105%'
+          comment-on-alert: true
+          fail-on-alert: false
+          auto-push: ${{ github.event_name == 'push' }}
+          save-data-file: ${{ github.event_name == 'push' }}
