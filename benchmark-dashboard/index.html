@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>reresvg benchmark dashboard</title>
+<style>
+  :root { color-scheme: dark; --border:#2a3340; --ink:#e8edf2; --muted:#8aa0b4; --accent:#e0863a; --raw:#5b9bd5; --bg:#0d1117; --panel:#121821; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.45 system-ui, sans-serif; }
+  header { padding:16px 20px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:8px; }
+  header h1 { font-size:16px; margin:0; }
+  header .meta { font-size:12px; color:var(--muted); font-family:ui-monospace, monospace; }
+  main { padding:16px 20px 60px; }
+  .band-label { font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin:18px 0 8px; padding-left:8px; border-left:3px solid var(--accent); }
+  .band-label.raw { border-left-color:var(--raw); }
+  section.metric { margin-bottom:16px; }
+  section.metric h2 { font-size:13px; margin:0 0 6px; font-weight:600; }
+  section.metric h2 .hint { font-weight:400; color:var(--muted); margin-left:6px; font-size:11px; }
+  .grid { display:flex; flex-wrap:wrap; gap:8px; }
+  .chart { width:96px; border:1px solid var(--border); border-radius:7px; padding:5px 5px 3px; background:var(--panel); cursor:pointer; }
+  .chart:hover { border-color:var(--accent); }
+  .chart .name { font-size:9px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:2px; }
+  .chart svg, .overlay svg { display:block; width:100%; }
+  .empty { color:var(--muted); font-size:12px; font-style:italic; }
+  .overlay-backdrop { position:fixed; inset:0; background:#000a; display:flex; align-items:center; justify-content:center; z-index:50; }
+  .overlay { background:var(--panel); border:1px solid var(--accent); border-radius:12px; padding:16px; width:min(560px, 92vw); box-shadow:0 20px 60px #000c; }
+  .overlay h3 { margin:0 0 2px; font-size:14px; }
+  .overlay .sub { font-size:11px; color:var(--muted); font-family:ui-monospace, monospace; margin-bottom:10px; }
+  .overlay .close { float:right; cursor:pointer; color:var(--muted); border:0; background:none; font-size:18px; line-height:1; }
+</style>
+</head>
+<body>
+<header>
+  <h1>reresvg benchmark dashboard</h1>
+  <span class="meta" id="meta"></span>
+</header>
+<main id="main"></main>
+<script src="./dev/bench/data.js"></script>
+<script type="module">
+import { buildDashboardModel } from "./dashboard-logic.mjs";
+
+const benchmarkData = window.BENCHMARK_DATA;
+const mainElement = document.getElementById("main");
+const metaElement = document.getElementById("meta");
+
+if (!benchmarkData || !benchmarkData.entries || Object.keys(benchmarkData.entries).length === 0) {
+  mainElement.innerHTML = '<p class="empty">No benchmark data found at ./dev/bench/data.js yet.</p>';
+} else {
+  const suiteName = Object.keys(benchmarkData.entries)[0];
+  const model = buildDashboardModel(benchmarkData, suiteName);
+  metaElement.textContent = `${model.suiteName} · ${model.runCount} commit-run(s) · from dev/bench/data.js`;
+  renderDashboard(model);
+}
+
+function formatValue(value) {
+  if (Math.abs(value) >= 1000) {
+    return value.toLocaleString("en-US", { maximumFractionDigits: 0 });
+  }
+  return value.toLocaleString("en-US", { maximumSignificantDigits: 6 });
+}
+
+function chartSvg(points, axis, options) {
+  const width = options.width;
+  const height = options.height;
+  const paddingLeft = options.withLabels ? 56 : 4;
+  const paddingTop = 6;
+  const paddingBottom = options.withLabels ? 16 : 4;
+  const plotWidth = width - paddingLeft - 6;
+  const plotHeight = height - paddingTop - paddingBottom;
+  const range = axis.max - axis.min || 1;
+  const count = points.length;
+  const horizontalAt = (index) => count <= 1 ? paddingLeft + plotWidth / 2 : paddingLeft + (plotWidth * index) / (count - 1);
+  const verticalAt = (value) => paddingTop + plotHeight - ((value - axis.min) / range) * plotHeight;
+  const stroke = options.isDerived ? "#e0863a" : "#5b9bd5";
+
+  let svgBody = "";
+  if (count > 1) {
+    const coordinates = points.map((point, index) => `${horizontalAt(index).toFixed(1)},${verticalAt(point.value).toFixed(1)}`);
+    svgBody += `<polyline fill="none" stroke="${stroke}" stroke-width="${options.withLabels ? 2 : 1.5}" points="${coordinates.join(" ")}"/>`;
+  }
+  for (let index = 0; index < points.length; index++) {
+    const centerX = horizontalAt(index).toFixed(1);
+    const centerY = verticalAt(points[index].value).toFixed(1);
+    const dotRadius = options.withLabels ? 3.5 : (count === 1 ? 2.5 : 1.6);
+    let dotMarkup = `<circle cx="${centerX}" cy="${centerY}" r="${dotRadius}" fill="${stroke}"/>`;
+    if (options.withTooltips) {
+      dotMarkup = `<a><title>${formatValue(points[index].value)} @ ${points[index].commitId}</title>${dotMarkup}</a>`;
+    }
+    svgBody += dotMarkup;
+  }
+  if (options.withLabels) {
+    svgBody += `<text x="${paddingLeft - 4}" y="12" text-anchor="end" font-size="9" fill="#8aa0b4">${formatValue(axis.max)}</text>`;
+    svgBody += `<text x="${paddingLeft - 4}" y="${height - paddingBottom + 10}" text-anchor="end" font-size="9" fill="#8aa0b4">${formatValue(axis.min)}</text>`;
+    svgBody += `<line x1="${paddingLeft}" y1="${paddingTop}" x2="${paddingLeft}" y2="${paddingTop + plotHeight}" stroke="#33445a"/>`;
+  }
+  return `<svg viewBox="0 0 ${width} ${height}" role="img">${svgBody}</svg>`;
+}
+
+function renderDashboard(model) {
+  const fragments = [];
+  let lastBand = null;
+  for (const section of model.sections) {
+    const band = section.isDerived ? "derived" : "raw";
+    if (band !== lastBand) {
+      lastBand = band;
+      fragments.push(section.isDerived
+        ? '<div class="band-label">★ Reinterpretation — quick scan</div>'
+        : '<div class="band-label raw">Raw metrics</div>');
+    }
+    const hint = section.hint ? `<span class="hint">${section.hint}</span>` : "";
+    let charts = "";
+    if (section.charts.length === 0) {
+      charts = '<p class="empty">No data.</p>';
+    } else {
+      for (const chart of section.charts) {
+        const mini = chartSvg(chart.points, chart.axis, { width: 86, height: 30, withLabels: false, withTooltips: false, isDerived: section.isDerived });
+        charts += `<div class="chart" data-section="${section.key}" data-benchmark="${encodeURIComponent(chart.benchmark)}"><div class="name" title="${chart.benchmark}">${chart.benchmark}</div>${mini}</div>`;
+      }
+    }
+    fragments.push(`<section class="metric"><h2>${section.label}${hint} <span class="hint">${section.unit}</span></h2><div class="grid">${charts}</div></section>`);
+  }
+  mainElement.innerHTML = fragments.join("");
+  attachOverlayHandlers(model);
+}
+
+function attachOverlayHandlers(model) {
+  const chartIndex = new Map();
+  for (const section of model.sections) {
+    for (const chart of section.charts) {
+      chartIndex.set(`${section.key}::${chart.benchmark}`, { section, chart });
+    }
+  }
+  for (const element of document.querySelectorAll(".chart")) {
+    element.addEventListener("click", () => {
+      const key = `${element.dataset.section}::${decodeURIComponent(element.dataset.benchmark)}`;
+      const entry = chartIndex.get(key);
+      if (entry) {
+        openOverlay(entry.section, entry.chart);
+      }
+    });
+  }
+}
+
+function openOverlay(section, chart) {
+  const large = chartSvg(chart.points, chart.axis, { width: 520, height: 240, withLabels: true, withTooltips: true, isDerived: section.isDerived });
+  const backdrop = document.createElement("div");
+  backdrop.className = "overlay-backdrop";
+  backdrop.innerHTML = `<div class="overlay" role="dialog" aria-modal="true">
+    <button class="close" aria-label="Close">×</button>
+    <h3>${chart.benchmark} — ${section.label}</h3>
+    <div class="sub">axis ${formatValue(chart.axis.min)} … ${formatValue(chart.axis.max)} ${section.unit} · hover a point for full precision</div>
+    ${large}
+  </div>`;
+  function close() {
+    backdrop.remove();
+    document.removeEventListener("keydown", handleKey);
+  }
+  function handleKey(event) {
+    if (event.key === "Escape") {
+      close();
+    }
+  }
+  backdrop.addEventListener("click", (event) => {
+    if (event.target === backdrop) {
+      close();
+    }
+  });
+  backdrop.querySelector(".close").addEventListener("click", close);
+  document.addEventListener("keydown", handleKey);
+  document.body.appendChild(backdrop);
+}
+</script>
+</body>
+</html>
