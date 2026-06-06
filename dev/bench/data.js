@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1780686493150,
+  "lastUpdate": 1780761177636,
   "repoUrl": "https://github.com/ArmandBurger/reresvg",
   "entries": {
     "usvg parser (iai-callgrind)": [
@@ -648,6 +648,705 @@ window.BENCHMARK_DATA = {
           {
             "name": "scaled/gradient — RAM Hits",
             "value": 38333,
+            "unit": "hits"
+          },
+          {
+            "name": "scaled/nested — Estimated Cycles",
+            "value": 19061040,
+            "unit": "cycles"
+          },
+          {
+            "name": "scaled/nested — Instructions",
+            "value": 12639008,
+            "unit": "instructions"
+          },
+          {
+            "name": "scaled/nested — L1 Hits",
+            "value": 17460120,
+            "unit": "hits"
+          },
+          {
+            "name": "scaled/nested — LL Hits",
+            "value": 119774,
+            "unit": "hits"
+          },
+          {
+            "name": "scaled/nested — RAM Hits",
+            "value": 28630,
+            "unit": "hits"
+          },
+          {
+            "name": "scaled/path — Estimated Cycles",
+            "value": 24920613,
+            "unit": "cycles"
+          },
+          {
+            "name": "scaled/path — Instructions",
+            "value": 19188921,
+            "unit": "instructions"
+          },
+          {
+            "name": "scaled/path — L1 Hits",
+            "value": 24583268,
+            "unit": "hits"
+          },
+          {
+            "name": "scaled/path — LL Hits",
+            "value": 12771,
+            "unit": "hits"
+          },
+          {
+            "name": "scaled/path — RAM Hits",
+            "value": 7814,
+            "unit": "hits"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "22417562+ArmandBurger@users.noreply.github.com",
+            "name": "ArmandBurger",
+            "username": "ArmandBurger"
+          },
+          "committer": {
+            "email": "22417562+ArmandBurger@users.noreply.github.com",
+            "name": "ArmandBurger",
+            "username": "ArmandBurger"
+          },
+          "distinct": true,
+          "id": "acdc68ec14513499c983fccf43fef55090bc85e2",
+          "message": "Merge branch 'feat/benchmark-dashboard'\n\nCustom zero-dependency benchmark dashboard published to gh-pages root,\nreplacing github-action-benchmark's single-column default page. Groups\ncharts by metric, pins derived/reinterpreted metrics on top, tight\nauto-fit Y axes, click-to-enlarge overlay.",
+          "timestamp": "2026-06-06T17:48:52+02:00",
+          "tree_id": "7e0d9fb8e1cd44cd0ed47d59803fb89474fddf8b",
+          "url": "https://github.com/ArmandBurger/reresvg/commit/acdc68ec14513499c983fccf43fef55090bc85e2"
+        },
+        "date": 1780761177139,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "per_element_kind/animate — Estimated Cycles",
+            "value": 6621812,
+            "unit": "cycles"
+          },
+          {
+            "name": "per_element_kind/animate — Instructions",
+            "value": 4457797,
+            "unit": "instructions"
+          },
+          {
+            "name": "per_element_kind/animate — L1 Hits",
+            "value": 6282722,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/animate — LL Hits",
+            "value": 26560,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/animate — RAM Hits",
+            "value": 5894,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/animate_motion — Estimated Cycles",
+            "value": 5229112,
+            "unit": "cycles"
+          },
+          {
+            "name": "per_element_kind/animate_motion — Instructions",
+            "value": 3488200,
+            "unit": "instructions"
+          },
+          {
+            "name": "per_element_kind/animate_motion — L1 Hits",
+            "value": 4954352,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/animate_motion — LL Hits",
+            "value": 22626,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/animate_motion — RAM Hits",
+            "value": 4618,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/animate_transform — Estimated Cycles",
+            "value": 9611357,
+            "unit": "cycles"
+          },
+          {
+            "name": "per_element_kind/animate_transform — Instructions",
+            "value": 6368079,
+            "unit": "instructions"
+          },
+          {
+            "name": "per_element_kind/animate_transform — L1 Hits",
+            "value": 9000752,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/animate_transform — LL Hits",
+            "value": 71868,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/animate_transform — RAM Hits",
+            "value": 7179,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/circle — Estimated Cycles",
+            "value": 6556161,
+            "unit": "cycles"
+          },
+          {
+            "name": "per_element_kind/circle — Instructions",
+            "value": 4320336,
+            "unit": "instructions"
+          },
+          {
+            "name": "per_element_kind/circle — L1 Hits",
+            "value": 6089681,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/circle — LL Hits",
+            "value": 60942,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/circle — RAM Hits",
+            "value": 4622,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/clip_path — Estimated Cycles",
+            "value": 12069146,
+            "unit": "cycles"
+          },
+          {
+            "name": "per_element_kind/clip_path — Instructions",
+            "value": 7973623,
+            "unit": "instructions"
+          },
+          {
+            "name": "per_element_kind/clip_path — L1 Hits",
+            "value": 11172896,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/clip_path — LL Hits",
+            "value": 104623,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/clip_path — RAM Hits",
+            "value": 10661,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/ellipse — Estimated Cycles",
+            "value": 7054934,
+            "unit": "cycles"
+          },
+          {
+            "name": "per_element_kind/ellipse — Instructions",
+            "value": 4690135,
+            "unit": "instructions"
+          },
+          {
+            "name": "per_element_kind/ellipse — L1 Hits",
+            "value": 6529389,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/ellipse — LL Hits",
+            "value": 70718,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/ellipse — RAM Hits",
+            "value": 4913,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/filter — Estimated Cycles",
+            "value": 11187513,
+            "unit": "cycles"
+          },
+          {
+            "name": "per_element_kind/filter — Instructions",
+            "value": 7311237,
+            "unit": "instructions"
+          },
+          {
+            "name": "per_element_kind/filter — L1 Hits",
+            "value": 10248418,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/filter — LL Hits",
+            "value": 119961,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/filter — RAM Hits",
+            "value": 9694,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/group — Estimated Cycles",
+            "value": 6920982,
+            "unit": "cycles"
+          },
+          {
+            "name": "per_element_kind/group — Instructions",
+            "value": 4563502,
+            "unit": "instructions"
+          },
+          {
+            "name": "per_element_kind/group — L1 Hits",
+            "value": 6447297,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/group — LL Hits",
+            "value": 56174,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/group — RAM Hits",
+            "value": 5509,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/image — Estimated Cycles",
+            "value": 7460011,
+            "unit": "cycles"
+          },
+          {
+            "name": "per_element_kind/image — Instructions",
+            "value": 5082919,
+            "unit": "instructions"
+          },
+          {
+            "name": "per_element_kind/image — L1 Hits",
+            "value": 6891046,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/image — LL Hits",
+            "value": 70932,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/image — RAM Hits",
+            "value": 6123,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/line — Estimated Cycles",
+            "value": 6395600,
+            "unit": "cycles"
+          },
+          {
+            "name": "per_element_kind/line — Instructions",
+            "value": 4190507,
+            "unit": "instructions"
+          },
+          {
+            "name": "per_element_kind/line — L1 Hits",
+            "value": 5949670,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/line — LL Hits",
+            "value": 55040,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/line — RAM Hits",
+            "value": 4878,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/linear_gradient — Estimated Cycles",
+            "value": 11817350,
+            "unit": "cycles"
+          },
+          {
+            "name": "per_element_kind/linear_gradient — Instructions",
+            "value": 7879509,
+            "unit": "instructions"
+          },
+          {
+            "name": "per_element_kind/linear_gradient — L1 Hits",
+            "value": 11029045,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/linear_gradient — LL Hits",
+            "value": 98994,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/linear_gradient — RAM Hits",
+            "value": 8381,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/marker — Estimated Cycles",
+            "value": 16888485,
+            "unit": "cycles"
+          },
+          {
+            "name": "per_element_kind/marker — Instructions",
+            "value": 10879587,
+            "unit": "instructions"
+          },
+          {
+            "name": "per_element_kind/marker — L1 Hits",
+            "value": 15255435,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/marker — LL Hits",
+            "value": 232208,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/marker — RAM Hits",
+            "value": 13486,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/mask — Estimated Cycles",
+            "value": 13277105,
+            "unit": "cycles"
+          },
+          {
+            "name": "per_element_kind/mask — Instructions",
+            "value": 8759546,
+            "unit": "instructions"
+          },
+          {
+            "name": "per_element_kind/mask — L1 Hits",
+            "value": 12269585,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/mask — LL Hits",
+            "value": 123965,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/mask — RAM Hits",
+            "value": 11077,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/path — Estimated Cycles",
+            "value": 4012450,
+            "unit": "cycles"
+          },
+          {
+            "name": "per_element_kind/path — Instructions",
+            "value": 2617099,
+            "unit": "instructions"
+          },
+          {
+            "name": "per_element_kind/path — L1 Hits",
+            "value": 3772120,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/path — LL Hits",
+            "value": 23566,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/path — RAM Hits",
+            "value": 3500,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/pattern — Estimated Cycles",
+            "value": 14722923,
+            "unit": "cycles"
+          },
+          {
+            "name": "per_element_kind/pattern — Instructions",
+            "value": 9781976,
+            "unit": "instructions"
+          },
+          {
+            "name": "per_element_kind/pattern — L1 Hits",
+            "value": 13834243,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/pattern — LL Hits",
+            "value": 102374,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/pattern — RAM Hits",
+            "value": 10766,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/polygon — Estimated Cycles",
+            "value": 3708754,
+            "unit": "cycles"
+          },
+          {
+            "name": "per_element_kind/polygon — Instructions",
+            "value": 2435908,
+            "unit": "instructions"
+          },
+          {
+            "name": "per_element_kind/polygon — L1 Hits",
+            "value": 3476964,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/polygon — LL Hits",
+            "value": 22327,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/polygon — RAM Hits",
+            "value": 3433,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/polyline — Estimated Cycles",
+            "value": 6153147,
+            "unit": "cycles"
+          },
+          {
+            "name": "per_element_kind/polyline — Instructions",
+            "value": 4029747,
+            "unit": "instructions"
+          },
+          {
+            "name": "per_element_kind/polyline — L1 Hits",
+            "value": 5688997,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/polyline — LL Hits",
+            "value": 63283,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/polyline — RAM Hits",
+            "value": 4221,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/radial_gradient — Estimated Cycles",
+            "value": 12024308,
+            "unit": "cycles"
+          },
+          {
+            "name": "per_element_kind/radial_gradient — Instructions",
+            "value": 8017548,
+            "unit": "instructions"
+          },
+          {
+            "name": "per_element_kind/radial_gradient — L1 Hits",
+            "value": 11231443,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/radial_gradient — LL Hits",
+            "value": 99843,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/radial_gradient — RAM Hits",
+            "value": 8390,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/rect — Estimated Cycles",
+            "value": 4630607,
+            "unit": "cycles"
+          },
+          {
+            "name": "per_element_kind/rect — Instructions",
+            "value": 3075280,
+            "unit": "instructions"
+          },
+          {
+            "name": "per_element_kind/rect — L1 Hits",
+            "value": 4373637,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/rect — LL Hits",
+            "value": 20762,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/rect — RAM Hits",
+            "value": 4376,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/set — Estimated Cycles",
+            "value": 6336593,
+            "unit": "cycles"
+          },
+          {
+            "name": "per_element_kind/set — Instructions",
+            "value": 4260398,
+            "unit": "instructions"
+          },
+          {
+            "name": "per_element_kind/set — L1 Hits",
+            "value": 6011743,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/set — LL Hits",
+            "value": 25987,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/set — RAM Hits",
+            "value": 5569,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/symbol — Estimated Cycles",
+            "value": 12895485,
+            "unit": "cycles"
+          },
+          {
+            "name": "per_element_kind/symbol — Instructions",
+            "value": 8383636,
+            "unit": "instructions"
+          },
+          {
+            "name": "per_element_kind/symbol — L1 Hits",
+            "value": 11835120,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/symbol — LL Hits",
+            "value": 128500,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/symbol — RAM Hits",
+            "value": 11939,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/use_ref — Estimated Cycles",
+            "value": 7096012,
+            "unit": "cycles"
+          },
+          {
+            "name": "per_element_kind/use_ref — Instructions",
+            "value": 4665942,
+            "unit": "instructions"
+          },
+          {
+            "name": "per_element_kind/use_ref — L1 Hits",
+            "value": 6635417,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/use_ref — LL Hits",
+            "value": 51974,
+            "unit": "hits"
+          },
+          {
+            "name": "per_element_kind/use_ref — RAM Hits",
+            "value": 5735,
+            "unit": "hits"
+          },
+          {
+            "name": "scaled/css — Estimated Cycles",
+            "value": 1300659938,
+            "unit": "cycles"
+          },
+          {
+            "name": "scaled/css — Instructions",
+            "value": 1079563277,
+            "unit": "instructions"
+          },
+          {
+            "name": "scaled/css — L1 Hits",
+            "value": 1280150428,
+            "unit": "hits"
+          },
+          {
+            "name": "scaled/css — LL Hits",
+            "value": 3916234,
+            "unit": "hits"
+          },
+          {
+            "name": "scaled/css — RAM Hits",
+            "value": 26524,
+            "unit": "hits"
+          },
+          {
+            "name": "scaled/flat — Estimated Cycles",
+            "value": 25527034,
+            "unit": "cycles"
+          },
+          {
+            "name": "scaled/flat — Instructions",
+            "value": 17000218,
+            "unit": "instructions"
+          },
+          {
+            "name": "scaled/flat — L1 Hits",
+            "value": 24010359,
+            "unit": "hits"
+          },
+          {
+            "name": "scaled/flat — LL Hits",
+            "value": 167136,
+            "unit": "hits"
+          },
+          {
+            "name": "scaled/flat — RAM Hits",
+            "value": 19457,
+            "unit": "hits"
+          },
+          {
+            "name": "scaled/gradient — Estimated Cycles",
+            "value": 62194151,
+            "unit": "cycles"
+          },
+          {
+            "name": "scaled/gradient — Instructions",
+            "value": 41818694,
+            "unit": "instructions"
+          },
+          {
+            "name": "scaled/gradient — L1 Hits",
+            "value": 58283036,
+            "unit": "hits"
+          },
+          {
+            "name": "scaled/gradient — LL Hits",
+            "value": 513808,
+            "unit": "hits"
+          },
+          {
+            "name": "scaled/gradient — RAM Hits",
+            "value": 38345,
             "unit": "hits"
           },
           {
