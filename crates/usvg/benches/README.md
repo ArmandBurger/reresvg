@@ -75,3 +75,10 @@ from each `summary.json` (iai-callgrind summary schema v3). Its tests run withou
 extra dependencies:
 
     python3 crates/usvg/benches/test_iai_converter.py
+
+## Dashboard
+
+A custom dashboard renders this history more legibly than the default page:
+grouped by metric, with derived metrics (cache miss rate, RAM miss rate,
+instructions/element, cycles/element) pinned on top and tight auto-fit axes.
+Source and docs: `benchmark-dashboard/`. Live: <https://armandburger.github.io/reresvg/>.
