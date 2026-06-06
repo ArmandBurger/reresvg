@@ -1,0 +1,50 @@
+name: deploy-dashboard
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - benchmark-dashboard/**
+      - .github/workflows/deploy-dashboard.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gh-pages-write
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+      - name: Test dashboard logic
+        run: node benchmark-dashboard/test_dashboard.mjs
+      - name: Publish dashboard to gh-pages root
+        run: |
+          set -euo pipefail
+          git worktree add --detach ../gh-pages-publish
+          cd ../gh-pages-publish
+          published=""
+          for attempt in 1 2 3; do
+            git fetch origin gh-pages
+            git checkout -q -B gh-pages-staging FETCH_HEAD
+            cp "$GITHUB_WORKSPACE/benchmark-dashboard/index.html" "$GITHUB_WORKSPACE/benchmark-dashboard/dashboard-logic.mjs" ./
+            git add index.html dashboard-logic.mjs
+            if git diff --cached --quiet; then
+              echo "No dashboard changes to publish."
+              published="yes"
+              break
+            fi
+            git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -m "deploy: update benchmark dashboard"
+            if git push origin HEAD:gh-pages; then
+              published="yes"
+              break
+            fi
+            echo "push rejected (concurrent gh-pages update?), retrying ($attempt)"
+          done
+          if [ -z "$published" ]; then
+            echo "dashboard publish failed after retries" >&2
+            exit 1
+          fi

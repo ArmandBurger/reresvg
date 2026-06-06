@@ -6,3 +6,4 @@ target
 .claude/
 docs/
 __pycache__/
+.superpowers/
